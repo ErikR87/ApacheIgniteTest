@@ -1,0 +1,44 @@
+﻿@page "/todo"
+@inject HttpClient http
+@using IT.Shared
+
+<h3>Todo</h3>
+
+<ul>
+    @foreach(var todo in todos)
+    {
+        <li>@todo.Name</li>
+    }
+</ul>
+
+<EditForm Model="@editTodo" OnValidSubmit="@submit">
+    <label>Name</label>
+    <InputText @bind-Value="@editTodo.Name" />
+    <button type="submit">Ok</button>
+</EditForm>
+
+@code {
+    IEnumerable<Todo> todos = new List<Todo>();
+    Todo editTodo = new Todo();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await http.GetFromJsonAsync<IEnumerable<Todo>>("api/Todo");
+            if(result != null)
+            {
+                todos = result;
+            }
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+    private async Task submit()
+    {
+        await http.PutAsJsonAsync<Todo>("api/Todo", editTodo);
+    }
+}
