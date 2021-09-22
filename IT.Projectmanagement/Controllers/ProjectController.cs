@@ -1,4 +1,6 @@
 ﻿using Apache.Ignite.Core;
+using Apache.Ignite.Core.Cache;
+using Apache.Ignite.Core.Cache.Configuration;
 using IT.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,16 +23,31 @@ namespace IT.Projectmanagement.Controllers
         {
             project.Id = Guid.NewGuid();
 
-            var cache = _ignite.GetOrCreateCache<Guid, Project>(nameof(Project));
-            await cache.PutAsync(project.Id, project);
+            await GetCache().PutAsync(project.Id, project);
         }
 
         [HttpGet]
         public async Task<IEnumerable<Project>> Get()
         {
-            var cache = _ignite.GetOrCreateCache<Guid, Project>(nameof(Project));
-            var query = cache.AsQueryable();
+            var query = GetCache().AsQueryable();
             return query.ToList().Select(x => x.Value);
+        }
+
+        private ICache<Guid, Project> GetCache()
+        {
+            var projectCfg = new CacheConfiguration(nameof(Project))
+            {
+                KeyConfiguration = new[]
+                {
+                    new CacheKeyConfiguration
+                    {
+                        TypeName = nameof(Project),
+                        AffinityKeyFieldName = nameof(Project.TodoId)
+                    }
+                }
+            };
+
+            return _ignite.GetOrCreateCache<Guid, Project>(projectCfg);
         }
     }
 }

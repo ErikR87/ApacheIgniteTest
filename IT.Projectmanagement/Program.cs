@@ -32,6 +32,13 @@ builder.Services.AddSingleton<IIgnite>(sp =>
     return ignite;
 });
 
+builder.Services.AddCors(c => c.AddPolicy("cors", builder =>
+    builder
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+));
+
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -46,13 +53,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "IT.Projectmanagement v1"));
 }
-
-builder.Services.AddCors(c => c.AddPolicy("cors", builder =>
-    builder
-        .AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-));
 
 app.UseHttpsRedirection();
 

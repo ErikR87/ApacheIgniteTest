@@ -5,6 +5,6 @@ namespace IT.Shared
     {
         public Guid Id { get; set; }
         public string Name {  get; set; }
-        public IEnumerable<Todo> Todos { get; set; }
+        public Guid TodoId { get; set; }
     }
 }
